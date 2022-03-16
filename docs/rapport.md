@@ -1,13 +1,12 @@
 # Rapport de projet
 
 ## Groupe
-* XXX
-* YYY
+* Ben KABONGO BUZANGU
 
 ## Description des choix importants d'implémentation
 
-Blablabla
+
 
 ## Description des résultats
 
-Blablabla
+
