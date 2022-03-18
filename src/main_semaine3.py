@@ -11,6 +11,7 @@ from __future__ import (absolute_import,
                         print_function, 
                         unicode_literals)
 import numpy as np
+import random
 import matplotlib.pyplot as plt
 import sys
 import pygame
@@ -48,6 +49,7 @@ def init(_boardname=None):
 
 def play(nb_iter, 
         nb_days=10, 
+        dist_min=12,
         strategy_team1=strategies.RandomStrategy,
         strategy_team2=strategies.RandomStrategy):
     
@@ -82,6 +84,7 @@ def play(nb_iter,
     verbose(f"Teams des joueurs \t: {players_teams}")
 
     # votants
+    cibles = [o for o in game.layers['ramassable']]
     goals_init_positions = [o.get_rowcol() for o in game.layers['ramassable']]
     nb_goals = len(goals_init_positions)
     verbose(f"Positions des votants \t: {goals_init_positions}")
@@ -90,15 +93,34 @@ def play(nb_iter,
     wall_positions = [w.get_rowcol() for w in game.layers['obstacle']]
     verbose(f"Positions des obstacles \t: {wall_positions}")
 
+    # liste des positions légales
+    legals_positions = []
+    for row in range(nb_lines):
+        for col in range(nb_cols):
+            if (row, col) not in wall_positions:
+                legals_positions.append((row, col))
+
     # initialisation des strategies
-    strategy_team1_instance = strategy_team1(1, team1_ids, nb_goals)
-    strategy_team2_instance = strategy_team2(2, team2_ids, nb_goals)
+    strategy_team1_instance = strategy_team1(1, team1_ids, nb_goals, dist_min)
+    strategy_team2_instance = strategy_team2(2, team2_ids, nb_goals, dist_min)
 
     # jour de propagandes
     
     players_current_positions = players_init_positions
+    goals_current_positions = goals_init_positions
     
     for _ in range(nb_days):
+        
+        # calculs des distances
+        team1_positions = {}
+        for i in team1_ids:
+            team1_positions[i] = players_current_positions[i]
+        team2_positions = {}
+        for i in team2_ids:
+            team2_positions[i] = players_current_positions[i]
+        
+        strategy_team1_instance.update_distances(team1_positions, goals_current_positions)
+        strategy_team2_instance.update_distances(team2_positions, goals_current_positions)
 
         # génération des  des objectifs en fonction des stratégies
         goals_id_team1, distribution_team1 = strategy_team1_instance.generate()
@@ -107,7 +129,7 @@ def play(nb_iter,
         goal_id_by_player = dict()
         goal_id_by_player.update(goals_id_team1)
         goal_id_by_player.update(goals_id_team2)
-        goals = {j: goals_init_positions[i] for j, i in goal_id_by_player.items()}
+        goals = {j: goals_current_positions[i] for j, i in goal_id_by_player.items()}
         
         # votes
         votes = [0] * nb_goals
@@ -135,6 +157,14 @@ def play(nb_iter,
             paths[i] = path
             verbose(f"Chemin trouvé pour le joueur {i} : {path}")
                     
+        # changement des positions des cibles
+        goals_current_positions = random.sample(legals_positions, nb_goals)
+
+        # mise à jour des distances entre joueurs et cibles
+        strategy_team1_instance.update_distances(team1_positions, goals_current_positions)
+        strategy_team2_instance.update_distances(team2_positions, goals_current_positions)
+
+        # mise en scène graphique
         goal_flag_by_player = {i:False for i in goals.keys()}
 
         for it in range(nb_iter):
@@ -145,7 +175,7 @@ def play(nb_iter,
                     players_current_positions[i] = (row, col)
                     players[i].set_rowcol(row, col)
                     verbose(f"Pos {i} :({row}, {col})")
-                    if (row,col) == goals[i]:
+                    if (row, col) == goals[i]:
                         verbose(f"Le joueur {i} a atteint son but !")
                         goal_flag_by_player[i] = True
             
@@ -153,6 +183,11 @@ def play(nb_iter,
                 break
 
             game.mainiteration()
+
+        # déplacement des cibles
+        for i in range(nb_goals):
+            cibles[i].set_rowcol(*goals_current_positions[i])
+            game.mainiteration()    
 
     pygame.quit()
     
@@ -166,7 +201,7 @@ def play(nb_iter,
 
 def main():
     nb_iter = int(sys.argv[1]) if len(sys.argv) == 2 else 100
-    play(nb_iter, 10, strategies.RandomStrategy, strategies.RandomStrategy)
+    play(nb_iter, 10, 3, strategies.RandomStrategy, strategies.RandomStrategy)
 
 if __name__ == '__main__':
     main()
