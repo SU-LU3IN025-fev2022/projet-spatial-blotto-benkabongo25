@@ -160,10 +160,6 @@ def play(nb_iter,
         # changement des positions des cibles
         goals_current_positions = random.sample(legals_positions, nb_goals)
 
-        # mise à jour des distances entre joueurs et cibles
-        strategy_team1_instance.update_distances(team1_positions, goals_current_positions)
-        strategy_team2_instance.update_distances(team2_positions, goals_current_positions)
-
         # mise en scène graphique
         goal_flag_by_player = {i:False for i in goals.keys()}
 
