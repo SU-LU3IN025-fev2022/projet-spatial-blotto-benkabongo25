@@ -7,74 +7,38 @@
 # Mars 2022
 # 
 
-from __future__ import (absolute_import, 
-                        print_function, 
-                        unicode_literals)
+import math
 import numpy as np
-import random
 import matplotlib.pyplot as plt
+import random
 import sys
-import pygame
-import pySpriteWorld.glo
-from pySpriteWorld.gameclass import Game,check_init_game_done
-from pySpriteWorld.spritebuilder import SpriteBuilder
-from pySpriteWorld.players import Player
-from pySpriteWorld.sprite import MovingSprite
-from pySpriteWorld.ontology import Ontology
+import strategies
 from search.grid2D import ProblemeGrid2D
 from search import probleme
-
-import strategies
 
 plt.style.use('seaborn-whitegrid')
 
 # verbose if verbose is true
-_VERBOSE = False
+_VERBOSE = True
 def verbose(*args, **kwargs):
     if _VERBOSE:
         print(*args, **kwargs)
 
 
-game = Game()
-
-def init(_boardname=None):
-    global player,game
-    name = _boardname if _boardname is not None else 'blottoMap'
-    game = Game('./Cartes/' + name + '.json', SpriteBuilder)
-    game.O = Ontology(True, 'SpriteSheet-32x32/tiny_spritesheet_ontology.csv')
-    game.populate_sprite_names(game.O)
-    game.fps = 5
-    game.mainiteration()
-    player = game.player
-    
-
-def play(nb_iter, 
+def play(nb_lines=20,
+        nb_cols=20,
+        nb_players=10,
+        nb_goals=5,
+        players_teams=[],
+        players_init_positions=[],
+        goals_init_positions=[],
+        wall_positions=[],
         nb_days=10, 
         dist_min=12,
         strategy_team1=strategies.RandomStrategy,
         strategy_team2=strategies.RandomStrategy):
-    
-    verbose("Initialisation ")
-    verbose(f"Nb d'itérations \t: {nb_iter}")
 
-    init('blottoMap')
-    nb_lines = game.spriteBuilder.rowsize
-    nb_cols = game.spriteBuilder.colsize
-
-    verbose(f"Nb de lignes \t: {nb_lines}")
-    verbose(f"Nb de colonnes \t: {nb_cols}")
-        
-    # joueurs
-    players = [o for o in game.layers['joueur']]
-    nb_players = len(players)
-    verbose(f"Nombre de joueurs \t: {nb_players}")
-    
-    # positions initiales des joueurs
-    players_init_positions = [o.get_rowcol() for o in players]
-    verbose(f"Positions intiales des joueurs \t: {players_init_positions}")
-    
     # teams
-    players_teams = [1 if y == 9 else 2 for _, y in players_init_positions]
     team1_ids = []
     team2_ids = []
     for i, t in enumerate(players_teams):
@@ -82,18 +46,7 @@ def play(nb_iter,
             team1_ids.append(i)
         else:
             team2_ids.append(i)
-    verbose(f"Teams des joueurs \t: {players_teams}")
-
-    # votants
-    cibles = [o for o in game.layers['ramassable']]
-    goals_init_positions = [o.get_rowcol() for o in game.layers['ramassable']]
-    nb_goals = len(goals_init_positions)
-    verbose(f"Positions des votants \t: {goals_init_positions}")
     
-    # obstacles
-    wall_positions = [w.get_rowcol() for w in game.layers['obstacle']]
-    verbose(f"Positions des obstacles \t: {wall_positions}")
-
     # liste des positions légales
     legals_positions = []
     for row in range(nb_lines):
@@ -110,8 +63,9 @@ def play(nb_iter,
     players_current_positions = players_init_positions
     goals_current_positions = goals_init_positions
     
-    for _ in range(nb_days):
-        
+    for day in range(nb_days):
+        verbose(f"Jour {day}")
+
         # calculs des distances
         team1_positions = {}
         for i in team1_ids:
@@ -150,44 +104,17 @@ def play(nb_iter,
             g = np.ones((nb_lines,nb_cols),dtype=bool)
             for w in wall_positions:
                 g[w] = False
-            p = ProblemeGrid2D(players_init_positions[i], goals[i], g, 'manhattan')
             _stdout = sys.__stdout__
             sys.stdout = None
+            p = ProblemeGrid2D(players_init_positions[i], goals[i], g, 'manhattan')
             path = probleme.astar(p)
             sys.stdout = _stdout
             paths[i] = path
-            verbose(f"Chemin trouvé pour le joueur {i} : {path}")
                     
         # changement des positions des cibles
         goals_current_positions = random.sample(legals_positions, nb_goals)
 
-        # mise en scène graphique
-        goal_flag_by_player = {i:False for i in goals.keys()}
-
-        for it in range(nb_iter):
-            for i in goals.keys():
-                if not goal_flag_by_player[i]:
-                    path = paths[i]
-                    row, col = path[it]
-                    players_current_positions[i] = (row, col)
-                    players[i].set_rowcol(row, col)
-                    verbose(f"Pos {i} :({row}, {col})")
-                    if (row, col) == goals[i]:
-                        verbose(f"Le joueur {i} a atteint son but !")
-                        goal_flag_by_player[i] = True
-            
-            if np.all(list(goal_flag_by_player.values())):
-                break
-
-            game.mainiteration()
-
-        # déplacement des cibles
-        for i in range(nb_goals):
-            cibles[i].set_rowcol(*goals_current_positions[i])
-            game.mainiteration()    
-
-    pygame.quit()
-    
+    # plot
     days = np.arange(0, nb_days+1)
 
     plt.title(f"Scores")
@@ -197,8 +124,6 @@ def play(nb_iter,
     plt.plot(days,
             strategy_team2_instance.cumulative_score_memory,
             label=strategy_team2_instance.name)
-    plt.xlabel("Jours")
-    plt.ylabel("Scores")
     plt.legend()
     plt.show()
     plt.clf()
@@ -210,15 +135,48 @@ def play(nb_iter,
     plt.plot(days,
             strategy_team2_instance.cumulative_coast_memory, 
             label=strategy_team2_instance.name)
-    plt.xlabel("Jours")
-    plt.ylabel("Coûts")
     plt.legend()
     plt.show()
     plt.clf()
 
+
 def main():
-    nb_iter = int(sys.argv[1]) if len(sys.argv) == 2 else 100
-    play(nb_iter, 1000, np.inf, strategies.NearStrategy, strategies.FarStrategy)
+    nb_lines = 30
+    nb_cols = 30
+    nb_players = 20
+    nb_goals = 8
+    nb_walls = int(0.2 * nb_lines * nb_cols)
+    nb_days = 1000
+    dist_min = math.inf
+
+    positions = random.sample(
+        [(row, col) for row in range(nb_lines) for col in range(nb_cols)],
+        nb_players + nb_goals + nb_walls
+    )
+
+    i, j = 0, nb_players
+    players_init_positions = positions[i: j]
+    i += nb_players; j += nb_goals
+    goals_init_positions = positions[i: j]
+    i += nb_goals
+    walls_positions = positions[i:]
+
+    players_teams = [1 for _ in range(nb_players//2)] + [2 for _ in range(nb_players//2)]
+
+    play(
+        nb_lines,
+        nb_cols,
+        nb_players,
+        nb_goals,
+        players_teams,
+        players_init_positions,
+        goals_init_positions,
+        walls_positions,
+        nb_days,
+        dist_min,
+        strategies.NearStrategy,
+        strategies.FarStrategy
+    )
 
 if __name__ == '__main__':
     main()
