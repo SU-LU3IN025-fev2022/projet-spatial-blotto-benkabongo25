@@ -51,8 +51,11 @@ def init(_boardname=None):
 def play(nb_iter, 
         nb_days=10, 
         dist_min=12,
-        strategy_team1=strategies.RandomStrategy,
-        strategy_team2=strategies.RandomStrategy):
+        strat1=strategies.RandomStrategy,
+        strat2=strategies.RandomStrategy,
+        strat1_args={},
+        strat2_args={}
+        ):
     
     verbose("Initialisation ")
     verbose(f"Nb d'itérations \t: {nb_iter}")
@@ -102,8 +105,10 @@ def play(nb_iter,
                 legals_positions.append((row, col))
 
     # initialisation des strategies
-    strategy_team1_instance = strategy_team1(1, team1_ids, nb_goals, dist_min)
-    strategy_team2_instance = strategy_team2(2, team2_ids, nb_goals, dist_min)
+    strat1_ = strat1(1, team1_ids, nb_goals, dist_min, **strat1_args)
+    strat2_ = strat2(2, team2_ids, nb_goals, dist_min, **strat2_args)
+    strat1_.set_adversary(strat2_)
+    strat2_.set_adversary(strat1_)
 
     # jour de propagandes
     
@@ -120,12 +125,12 @@ def play(nb_iter,
         for i in team2_ids:
             team2_positions[i] = players_current_positions[i]
         
-        strategy_team1_instance.update_distances(team1_positions, goals_current_positions)
-        strategy_team2_instance.update_distances(team2_positions, goals_current_positions)
+        strat1_.update_distances(team1_positions, goals_current_positions)
+        strat2_.update_distances(team2_positions, goals_current_positions)
 
         # génération des  des objectifs en fonction des stratégies
-        goals_id_team1, distribution_team1 = strategy_team1_instance.generate()
-        goals_id_team2, distribution_team2 = strategy_team2_instance.generate()
+        goals_id_team1, distribution_team1 = strat1_.generate()
+        goals_id_team2, distribution_team2 = strat2_.generate()
 
         goal_id_by_player = dict()
         goal_id_by_player.update(goals_id_team1)
@@ -141,8 +146,8 @@ def play(nb_iter,
                 votes[i] = 2
 
         # sauvegarde des votes et des scores du jour
-        strategy_team1_instance.save_day_results(votes)
-        strategy_team2_instance.save_day_results(votes)
+        strat1_.save_day_results(votes)
+        strat2_.save_day_results(votes)
 
         # Calcul de A* pour chaque joueur
         paths = {}
@@ -192,39 +197,44 @@ def play(nb_iter,
 
     plt.title(f"Scores")
     plt.plot(days, 
-            strategy_team1_instance.cumulative_score_memory, 
-            label=strategy_team1_instance.name)
+            strat1_.cumulative_score_memory, 
+            label=strat1_.name)
     plt.plot(days,
-            strategy_team2_instance.cumulative_score_memory,
-            label=strategy_team2_instance.name)
+            strat2_.cumulative_score_memory,
+            label=strat2_.name)
     plt.xlabel("Jours")
     plt.ylabel("Scores")
     plt.legend()
     plt.savefig(
-        f'./out/scores/{strategy_team1_instance.name}_{strategy_team2_instance.name}_'+
+        f'./out/scores/{strat1_.name}_{strat2_.name}_'+
         f'days_{nb_days}_dist_{("inf" if dist_min == np.inf else dist_min)}.png'
     )
     plt.clf()
 
     plt.title(f"Coûts des trajets")
     plt.plot(days,
-            strategy_team1_instance.cumulative_coast_memory, 
-            label=strategy_team1_instance.name)
+            strat1_.cumulative_coast_memory, 
+            label=strat1_.name)
     plt.plot(days,
-            strategy_team2_instance.cumulative_coast_memory, 
-            label=strategy_team2_instance.name)
+            strat2_.cumulative_coast_memory, 
+            label=strat2_.name)
     plt.xlabel("Jours")
     plt.ylabel("Coûts")
     plt.legend() 
     plt.savefig(
-        f'./out/coasts/{strategy_team1_instance.name}_{strategy_team2_instance.name}_'+
+        f'./out/coasts/{strat1_.name}_{strat2_.name}_'+
         f'days_{nb_days}_dist_{("inf" if dist_min == np.inf else dist_min)}.png'
     )
     plt.clf()
 
-def main():
-    nb_iter = int(sys.argv[1]) if len(sys.argv) == 2 else 100
-    play(nb_iter, 20, np.inf, strategies.RandomStrategy, strategies.StubbornStrategy)
 
 if __name__ == '__main__':
-    main()
+    play(
+        int(sys.argv[1]) if len(sys.argv) == 2 else 100,
+        100, 
+        np.inf, 
+        strategies.EpsilonStrategy, 
+        strategies.EpsilonImitatorMixStrategy,
+        {'eps': 0.6},
+        {'eps': 0.4}
+    )
