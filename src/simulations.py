@@ -124,8 +124,13 @@ def play(nb_lines=20,
     plt.plot(days,
             strategy_team2_instance.cumulative_score_memory,
             label=strategy_team2_instance.name)
+    plt.xlabel("Jours")
+    plt.ylabel("Scores")
     plt.legend()
-    plt.show()
+    plt.savefig(
+        f'./out/scores/{strategy_team1_instance.name}_{strategy_team2_instance.name}_'+
+        f'days_{nb_days}_dist_{("inf" if dist_min == np.inf else dist_min)}.png'
+    )
     plt.clf()
 
     plt.title(f"Coûts des trajets")
@@ -135,10 +140,14 @@ def play(nb_lines=20,
     plt.plot(days,
             strategy_team2_instance.cumulative_coast_memory, 
             label=strategy_team2_instance.name)
-    plt.legend()
-    plt.show()
+    plt.xlabel("Jours")
+    plt.ylabel("Coûts")
+    plt.legend() 
+    plt.savefig(
+        f'./out/coasts/{strategy_team1_instance.name}_{strategy_team2_instance.name}_'+
+        f'days_{nb_days}_dist_{("inf" if dist_min == np.inf else dist_min)}.png'
+    )
     plt.clf()
-
 
 def main():
     nb_lines = 30
@@ -146,7 +155,7 @@ def main():
     nb_players = 20
     nb_goals = 8
     nb_walls = int(0.2 * nb_lines * nb_cols)
-    nb_days = 1000
+    nb_days = 100
     dist_min = math.inf
 
     positions = random.sample(
@@ -174,8 +183,8 @@ def main():
         walls_positions,
         nb_days,
         dist_min,
-        strategies.NearStrategy,
-        strategies.FarStrategy
+        strategies.RandomStrategy,
+        strategies.RandomStrategy
     )
 
 if __name__ == '__main__':

@@ -200,7 +200,10 @@ def play(nb_iter,
     plt.xlabel("Jours")
     plt.ylabel("Scores")
     plt.legend()
-    plt.show()
+    plt.savefig(
+        f'./out/scores/{strategy_team1_instance.name}_{strategy_team2_instance.name}_'+
+        f'days_{nb_days}_dist_{("inf" if dist_min == np.inf else dist_min)}.png'
+    )
     plt.clf()
 
     plt.title(f"Coûts des trajets")
@@ -212,13 +215,16 @@ def play(nb_iter,
             label=strategy_team2_instance.name)
     plt.xlabel("Jours")
     plt.ylabel("Coûts")
-    plt.legend()
-    plt.show()
+    plt.legend() 
+    plt.savefig(
+        f'./out/coasts/{strategy_team1_instance.name}_{strategy_team2_instance.name}_'+
+        f'days_{nb_days}_dist_{("inf" if dist_min == np.inf else dist_min)}.png'
+    )
     plt.clf()
 
 def main():
     nb_iter = int(sys.argv[1]) if len(sys.argv) == 2 else 100
-    play(nb_iter, 1000, np.inf, strategies.NearStrategy, strategies.FarStrategy)
+    play(nb_iter, 20, np.inf, strategies.RandomStrategy, strategies.StubbornStrategy)
 
 if __name__ == '__main__':
     main()
