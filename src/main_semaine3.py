@@ -227,11 +227,29 @@ def play(nb_iter,
     )
     plt.clf()
 
+    plt.title(f"Rapport Score/Coût")
+    plt.plot(days,
+            (np.array(strat1_.cumulative_score_memory) / 
+            np.array(strat1_.cumulative_coast_memory)), 
+            label=strat1_.name)
+    plt.plot(days,
+            (np.array(strat2_.cumulative_score_memory) / 
+            np.array(strat2_.cumulative_coast_memory)), 
+            label=strat2_.name)
+    plt.xlabel("Jours")
+    plt.ylabel("Coûts")
+    plt.legend() 
+    plt.savefig(
+        f'./out/scores_coasts/{strat1_.name}_{strat2_.name}_'+
+        f'days_{nb_days}_dist_{("inf" if dist_min == np.inf else dist_min)}.png'
+    )
+    plt.clf()
+
 
 if __name__ == '__main__':
     play(
         int(sys.argv[1]) if len(sys.argv) == 2 else 100,
-        100, 
+        12, 
         np.inf, 
         strategies.EpsilonStrategy, 
         strategies.EpsilonImitatorMixStrategy,

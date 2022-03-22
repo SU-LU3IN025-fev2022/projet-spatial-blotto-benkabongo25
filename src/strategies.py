@@ -12,6 +12,91 @@ import numpy as np
 import random
 
 
+def compare(r1, r2):
+    '''
+    compare deux stratégies et retourne la meilleure
+    :param r1 (list) 
+        stratégie de répartition 1
+    :parm r2 (list)
+        stratégie de répartition 2
+    :return int, int
+        le numéro et le score de la répartition gagnate
+    '''
+    s = np.sum(np.array(r1) > np.array(r2))
+    a = s / len(r2)
+    if a == .5:
+        return 0, 0
+    w = 1 if a > .5 else 2
+    return w, s
+    
+
+def generate_distrib(limit, size):
+    '''
+    génère une distribution dont la somme est bornée à limit
+    :param limit (int)
+        borne supérieure 
+    :param size (int)
+        taille de la distribution
+    '''
+    if size == 1:
+        return [[i] for i in range(limit+1)]
+    distribs = []
+    for i in range(limit+1):
+        for distrib in generate_distrib(limit-i, size-1):
+            distribs.append( [i] + distrib )
+    return distribs
+
+
+def better_answer(r, limit):
+    '''
+    :param r (list)
+        stratégie de répartition
+    :param limit (int)
+        nombre maximum de ressources (joueurs) à répartir
+    :return (list)
+        une stratégie de répartition bien meilleure que r
+    '''
+    for answer in generate_distrib(limit, len(r)):
+        w, _ = compare(answer, r)
+        if w == 1:
+            return tuple(answer)
+
+
+def all_better_answers(r, limit):
+    '''
+    :param r (list)
+        stratégie de répartition
+    :param limit (int)
+        nombre maximum de ressources (joueurs) à répartir
+    :return (dict)
+        la liste de toutes les stratégies meilleures que r et leur score
+    '''
+    answers = {}
+    for answer in generate_distrib(limit, len(r)):
+        w, s = compare(answer, r)
+        if w == 1:
+            answers[tuple(answer)] = s
+    return answers
+
+
+def best_answer(r, limit):
+    '''
+    :param r (list)
+        stratégie de répartition
+    :param limit (int)
+        nombre maximum de ressources (joueurs) à répartir
+    :return (list)
+        la meilleure des stratégies de répartition bien meilleures que r
+    '''
+    best = None
+    s = 0
+    for answer, score in all_better_answers(r, limit).items():
+        if score > s:
+            best = answer
+            s = score
+    return best
+    
+
 class Strategy:
     '''
     Classe de base pour les stratégies des joueurs
@@ -53,6 +138,14 @@ class Strategy:
         self.travel_coast_memory     = [] # coût des trajets / jour
         self.cumulative_score_memory = [0] # score cumulé
         self.cumulative_coast_memory = [0] # coût cumulé
+
+        # dictionnaire des stratégies jouées
+        self.strat_cum_scores  = {} # somme cumulée
+        self.strat_mean_scores = {} # scores moyens
+        self.strat_counts      = {} # compteurs
+        
+        # meilleure stratégie courante
+        self.current_best = []
 
         # distances 
         self.dist_min = dist_min
@@ -103,6 +196,16 @@ class Strategy:
         self.distrib_memory.append(r)
         print(self.name, r)
         return v, r
+
+    def _generate_random_distribution(self):
+        '''
+        génère une distribution aléatoire
+        :return list
+            liste générée
+        '''
+        a = self.nb_team_players
+        b = self.nb_goals
+        return list(np.random.multinomial(a, np.ones(b)/b, size=1)[0])
 
     def from_distribution(self, r):
         '''
@@ -387,14 +490,6 @@ class EpsilonStrategy(Strategy):
                         dist_min)
         self.eps = eps
 
-        # dictionnaire des stratégies jouées
-        self.strat_cum_scores  = {} # somme cumulée
-        self.strat_mean_scores = {} # scores moyens
-        self.strat_counts      = {} # compteurs
-        
-        # meilleure stratégie courante
-        self.current_best = []
-
     def generate(self):
         if len(self.strat_counts) == 0 or random.random() < self.eps: # random
             v = {}
@@ -499,14 +594,6 @@ class EpsilonImitatorStrategy(Strategy):
         )
         self.eps = eps
 
-        # dictionnaire des stratégies jouées
-        self.strat_cum_scores  = {} # somme cumulée
-        self.strat_mean_scores = {} # scores moyens
-        self.strat_counts      = {} # compteurs
-        
-        # meilleure stratégie courante
-        self.current_best = []
-
     def generate(self):
         if len(self.strat_counts) == 0 or random.random() < self.eps: # random
             v = {}
@@ -519,6 +606,9 @@ class EpsilonImitatorStrategy(Strategy):
 
     def save_day_results(self, votes):
         super().save_day_results(votes)
+        
+        if len(self.adversary_strategy.distrib_memory) == 0:
+            return
         
         r = self.adversary_strategy.distrib_memory[-1]
         s = self.adversary_strategy.score_memory[-1]
@@ -566,14 +656,6 @@ class EpsilonImitatorMixStrategy(Strategy):
         )
         self.eps = eps
 
-        # dictionnaire des stratégies jouées
-        self.strat_cum_scores  = {} # somme cumulée
-        self.strat_mean_scores = {} # scores moyens
-        self.strat_counts      = {} # compteurs
-        
-        # meilleure stratégie courante
-        self.current_best = []
-
     def generate(self):
         if len(self.strat_counts) == 0 or random.random() < self.eps: # random
             v = {}
@@ -595,13 +677,14 @@ class EpsilonImitatorMixStrategy(Strategy):
         self.strat_cum_scores[r] += s
         self.strat_counts[r] += 1
         
-        r = self.adversary_strategy.distrib_memory[-1]
-        s = self.adversary_strategy.score_memory[-1]
-        if r not in self.strat_counts:
-            self.strat_cum_scores[r] = 0
-            self.strat_counts[r] = 0
-        self.strat_cum_scores[r] += s
-        self.strat_counts[r] += 1
+        if len(self.adversary_strategy.distrib_memory) > 0:
+            r = self.adversary_strategy.distrib_memory[-1]
+            s = self.adversary_strategy.score_memory[-1]
+            if r not in self.strat_counts:
+                self.strat_cum_scores[r] = 0
+                self.strat_counts[r] = 0
+            self.strat_cum_scores[r] += s
+            self.strat_counts[r] += 1
 
         r_max = []
         max_mean = 0
@@ -614,11 +697,11 @@ class EpsilonImitatorMixStrategy(Strategy):
         self.current_best = list(r_max)
 
 
-class BestAnswerStrategy(Strategy):
+class BetterAnswerLastAdversaryStrategy(Strategy):
     '''
-    Stratégie de meilleure réponse
+    Stratégie de meilleure réponse version 1
 
-    Meilleure réponse à la stratégie précédente de l'équipe adverse
+    Rend une meilleure réponse à la stratégie précédente de l'équipe adverse
     '''
 
     def __init__(self, 
@@ -629,7 +712,7 @@ class BestAnswerStrategy(Strategy):
                 adversary_strategy=None
                 ):
         Strategy.__init__(self,
-                        'best_answer', 
+                        'better_answer_last_adversary', 
                         team_id, 
                         players_ids, 
                         nb_goals, 
@@ -637,5 +720,148 @@ class BestAnswerStrategy(Strategy):
         self.adversary_strategy = adversary_strategy
 
     def generate(self):
-        r = self.adversary_strategy[0]
+        if len(self.adversary_strategy.distrib_memory) == 0:
+            r = self._generate_random_distribution()
+        else:
+            r = self.adversary_strategy.distrib_memory[-1]
+        best = better_answer(r, self.nb_team_players)
+        if best is None:
+            best = []
+        return self.from_distribution(best)    
 
+
+class BestAnswerLastAdversaryStrategy(Strategy):
+    '''
+    Stratégie de meilleure réponse
+
+    Rend la meilleure réponse à la stratégie précédente de l'équipe adverse
+    '''
+
+    def __init__(self, 
+                team_id, 
+                players_ids, 
+                nb_goals, 
+                dist_min=math.inf,
+                adversary_strategy=None
+                ):
+        Strategy.__init__(self,
+                        'best_answer_last_adversary', 
+                        team_id, 
+                        players_ids, 
+                        nb_goals, 
+                        dist_min)
+        self.adversary_strategy = adversary_strategy
+
+    def generate(self):
+        if len(self.adversary_strategy.distrib_memory) == 0:
+            r = self._generate_random_distribution()
+        else:
+            r = self.adversary_strategy.distrib_memory[-1]
+        best = best_answer(r, self.nb_team_players)
+        if best is None:
+            best = []
+        return self.from_distribution(best)    
+
+
+class BestAnswerAdversaryStrategy(Strategy):
+    '''
+    Stratégie de meilleure réponse
+
+    Rend la meilleure réponse à la meilleure stratégie de l'équipe adverse
+    '''
+
+    def __init__(self, 
+                team_id, 
+                players_ids, 
+                nb_goals, 
+                dist_min=math.inf,
+                ):
+        Strategy.__init__(self,
+                        'best_answer_adversary', 
+                        team_id, 
+                        players_ids, 
+                        nb_goals, 
+                        dist_min)
+
+    def generate(self):
+        if self.current_best == []:
+            self.current_best = self._generate_random_distribution()
+        best = best_answer(self.current_best, self.nb_team_players)
+        if best is None:
+            best = self.current_best
+        return self.from_distribution(best)    
+
+    def save_day_results(self, votes):
+        super().save_day_results(votes)
+
+        if len(self.adversary_strategy.distrib_memory) > 0:
+            r = self.adversary_strategy.distrib_memory[-1]
+            s = self.adversary_strategy.score_memory[-1]
+            if r not in self.strat_counts:
+                self.strat_cum_scores[r] = 0
+                self.strat_counts[r] = 0
+            self.strat_cum_scores[r] += s
+            self.strat_counts[r] += 1
+
+        r_max = []
+        max_mean = 0
+        for r in self.strat_counts:
+            mean = self.strat_cum_scores[r] / self.strat_counts[r]
+            if mean > max_mean:
+                max_mean = mean
+                r_max = r
+            self.strat_mean_scores[r] = mean
+        self.current_best = list(r_max)
+
+
+class FicticiousPlayStrategy(Strategy):
+    '''
+    Ficticious play
+    '''
+    
+    def __init__(self, 
+                team_id, 
+                players_ids, 
+                nb_goals, 
+                dist_min=math.inf,
+                ):
+        Strategy.__init__(self,
+                        'best_answer_adversary', 
+                        team_id, 
+                        players_ids, 
+                        nb_goals, 
+                        dist_min)
+
+        self.strategy_set = generate_distrib(self.nb_team_players, self.nb_goals)
+        self.adversary_strategy_counts = {}
+        self.adversary_strategy_probas = {}
+
+    def generate(self):
+        if len(self.adversary_strategy_counts) == 0:
+            r = self._generate_random_distribution()
+            return self.from_distribution(r)
+        best = []
+        score_max = 0
+        for r in self.strategy_set:
+            score = 0
+            for ra, p in self.adversary_strategy_probas.items():
+                w, s = compare(r, ra)
+                if w == 2: s = self.nb_goals - s
+                score += s * p
+            if score > score_max:
+                score_max = score
+                best = r
+        return self.from_distribution(best)
+
+    def save_day_results(self, votes):
+        super().save_day_results(votes)
+
+        if len(self.adversary_strategy.distrib_memory) > 0:
+            r = self.adversary_strategy.distrib_memory[-1]
+            if r not in self.adversary_strategy_counts:
+                self.adversary_strategy_counts[r] = 0
+            self.adversary_strategy_counts[r] += 1
+
+        n = len(self.distrib_memory)
+        for r in self.adversary_strategy:
+            self.adversary_strategy_probas[r] = self.adversary_strategy_counts[r] / n

@@ -154,6 +154,24 @@ def play(nb_lines=20,
     )
     plt.clf()
 
+    plt.title(f"Rapport Score/Coût")
+    plt.plot(days,
+            (np.array(strat1_.cumulative_score_memory) / 
+            np.array(strat1_.cumulative_coast_memory)), 
+            label=strat1_.name)
+    plt.plot(days,
+            (np.array(strat2_.cumulative_score_memory) / 
+            np.array(strat2_.cumulative_coast_memory)), 
+            label=strat2_.name)
+    plt.xlabel("Jours")
+    plt.ylabel("Coûts")
+    plt.legend() 
+    plt.savefig(
+        f'./out/scores_coasts/{strat1_.name}_{strat2_.name}_'+
+        f'days_{nb_days}_dist_{("inf" if dist_min == np.inf else dist_min)}.png'
+    )
+    plt.clf()
+
 def main():
     nb_lines = 30
     nb_cols = 30
