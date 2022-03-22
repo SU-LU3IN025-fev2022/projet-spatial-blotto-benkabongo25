@@ -47,7 +47,7 @@ Nous avons ainsi pourvu la classe d'un attribut `adversary_strategy` qui est une
 
 La méthode `set_adversary(self, adversary)` permet d'initialiser cette stratégie adverse.
 
-##### Distances et accessibilités
+#### Distances et accessibilités
 
 La classe maintient également à jour deux dictionnaires dont les clés sont les identifiants des joueurs. Ces dictionnaires sont `distances` et `accessibles`.
 
@@ -57,7 +57,7 @@ Dans le second, sont régulièrement mis à jour les cibles accessibles de chaqu
 
 La méthode `update_distances(team_positions_dict, goals_positions_list)` prend en paramètres un dictionnaire des positions courantes des joueurs de l'équipe (les clés sont les indices des joueurs et les valeurs sont les positions courantes) et une liste des positions courantes des cibles, et calcule pour chaque joueur la distance avec chaque cible.
 
-##### Mémoires
+#### Mémoires
 
 Elle initialise par ailleurs des `mémoires` afin de sauvegarder des informations diverses, utiles pour certaines classes de stratégies, mais également pour nos diagrammes et analyses. Ces mémoires sont :
 - `Une mémoire de la distribution`: dans cette mémoire, on stocke la répartition des joueurs en fonction des cibles. Nous avons jugé qu'il n'était pas pertinent de savoir quel joueur exactement avait pour cible tel ou tel autre électeur, quand les joueurs font partis de la même équipe. Ici, on mémorise uniquement le nombre de joueurs de l'équipe envoyés à la cible pour un jour donné.
@@ -66,7 +66,7 @@ Ce choix faciletera notamment le décompte des votes. En effet, pour chaque indi
 - `Une mémoire des scores et des scores cumulés`: on y sauvegarde le score en fonction des jours.
 - `Une mémoire des distances et des distances cumulées`: on y sauvegarde la somme des distances parcourues par jour par tous les joueurs pour atteindre leurs cibles.
 
-##### Génération de distribution
+#### Génération de distribution
 
 La méthode `generate` renvoie la cible attribuée à chaque joueur de l'équipe.
 Chaque classe de stratégie rédéfini cette méthode afin de renvoyer la répartition correspondante après décision.
@@ -79,7 +79,9 @@ La méthode `save_day_result(votes)` prend en paramètres une liste des votes de
 
 #### Autres paramètres
 
-Globalement, toutes les stratégies fonctionnent avec ces paramètres. D'autres stratégies ont besoin de paramètres supplémentaires particuliers.
+Globalement, toutes les stratégies fonctionnent avec ces paramètres. D'autres stratégies ont besoin de paramètres supplémentaires particuliers :
+- une `distribution` pour le cas de la stratégie du tétu.
+- une valeur `epsilon` pour différentes stratégies, qui avec une probabilité `epsilon` choisiront par exemple une répartition aléatoire et avec une probabilité `1-epsilon` effectueront leur choix différemment.
 
 ### Présentation des stratégies
 
