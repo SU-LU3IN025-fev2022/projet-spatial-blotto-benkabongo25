@@ -141,6 +141,7 @@ Nous avons également représenté les courbes des **scores/coûts**.
 
 #### Aléatoire contre aléatoire
 
+<img src=''>
 ![alt text](/out/scores/random_random_days_100_dist_inf.png)
 ![alt text](/out/coasts/random_random_days_100_dist_inf.png)
 ![alt text](/out/scores_coasts/random_random_days_100_dist_inf.png)
