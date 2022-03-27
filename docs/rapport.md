@@ -132,7 +132,16 @@ Aggrégat de plusieurs stratégies de jeu. A chaque coup, avec une probabilité 
 Nous avons lancé des tournois et comparé toutes les stratégies que nous avons implémentées entre elles.
 Nous allons ici présenter les résultats que nous avons obtenus.
 
+Nous nous sommes intéressés à deux critères pour nos comparaisons : **le score cumulé** et **le coût de trajet cumulé** au fil des jours de campagne.
+
+Nous avons ainsi représenté pour chaque affrontement les deux courbes associées.
+Nous avons également représenté les courbes des **scores/coûts**. 
+
 ### Aléatoire
 
+#### Aléatoire contre aléatoire
+
 ![alt text](/out/scores/random_random_days_100_dist_inf.png)
+![alt text](/out/cosats/random_random_days_100_dist_inf.png)
+![alt text](/out/scores_coasts/random_random_days_100_dist_inf.png)
 
