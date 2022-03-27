@@ -142,6 +142,11 @@ Nous avons également représenté les courbes des **scores/coûts**.
 #### Aléatoire contre aléatoire
 
 ![alt text](/out/scores/random_random_days_100_dist_inf.png)
-![alt text](/out/cosats/random_random_days_100_dist_inf.png)
+![alt text](/out/coasts/random_random_days_100_dist_inf.png)
 ![alt text](/out/scores_coasts/random_random_days_100_dist_inf.png)
 
+### Aléatoire contre tétu
+
+![alt text](/out/scores/random_stubborn_1_days_100_dist_inf.png)
+![alt text](/out/coasts/random_stubborn_1_days_100_dist_inf.png)
+![alt text](/out/scores_coasts/random_stubborn_1_days_100_dist_inf.png)
