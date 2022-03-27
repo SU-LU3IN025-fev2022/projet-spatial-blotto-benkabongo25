@@ -85,34 +85,47 @@ Globalement, toutes les stratégies fonctionnent avec ces paramètres. D'autres 
 
 ### Présentation des stratégies
 
-#### Aléatoire
+#### Aléatoire (RandomStrategy)
+Les cibles sont choisies de manière aléatoire pour chaque joueur.
 
-#### Cible la plus proche
+#### Cible la plus proche (NearStrategy)
+Chaque joueur choisit la cible accessible la plus proche.
 
-#### Cible la plus éloignée
+#### Cible la plus éloignée (FarStrategy)
+Chaque joueur choisit la cible accessible la plus éloignée.
 
-#### Déterministe : toujours les mêmes cibles pour les joueurs
+#### Déterministe : toujours les mêmes cibles pour les joueurs (StubbornStrategy1)
+Première version de la stratégie tétu. Les joueurs ont toujours les mêmes cibles, sous critère d'accessibilité.
 
-#### Déterministe : toujours le même nombre de joueurs par cible
+#### Déterministe : toujours le même nombre de joueurs par cible (StubbornStrategy2)
+Seconde version de la stratégie tétu. Les cibles se voient toujours attribués un même nombre de joueurs.
 
-#### Epsilon-greedy
+#### Epsilon-greedy (EpsilonStrategy)
+Avec une probabilité *epsilon*, la stratégie choisie est aléatoire ; avec une probabilité *1-epsilon*, la stratégie choisie est la meilleure parmi toutes les stratégies jouées précédemment.
 
 #### Imitateur d'adversaire
+Stratégie qui rejoue le dernier coup de l'adversaire.
 
 #### Epsilon-greedy imitateur d'adversaire
+Avec une probabilité *epsilon*, la stratégie choisie est aléatoire ; avec une probabilité *1-epsilon*, la stratégie choisie est la meilleure parmi toutes les stratégies de l'adversaire jouées précédemment.
 
 #### Epsilon-greedy mix
+Avec une probabilité *epsilon*, la stratégie choisie est aléatoire ; avec une probabilité *1-epsilon*, la stratégie choisie est la meilleure parmi toutes les stratégies jouées précédemment, y compris celles de l'adversaire.
 
 #### Réponse améliorante au dernier coup de l'adversaire
+La stratégie choisie est une réponse meilleure (une stratégie qui domine faiblement) la dernière stratégie de l'adversaire.
 
 #### Meilleure réponse au dernier coup de l'adversaire
+La stratégie choisie est la meilleure réponse possible à la dernière stratégie de l'adversaire.
 
 #### Meilleure réponse au meilleur coup
+La stratégie choisie est la meilleure réponse au meilleur coup joué jusqu'à lors par l'adversaire.
 
 #### Ficticious play
+Implémentation du ficticious play.
 
 #### Stochastique expert
-
+Aggrégat de plusieurs stratégies de jeu. A chaque coup, avec une probabilité donnée, une certaine stratégie est choisie.
 
 ## Description des résultats
 
