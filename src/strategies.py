@@ -564,8 +564,11 @@ class AdversaryImitatorStrategy(Strategy):
         )
 
     def generate(self):
-        r = self.adversary_strategy.distrib_memory[-1]
-        return self.from_distribution(r)
+        if len(self.adversary_strategy.distrib_memory) == 0:
+            r = self._generate_random_distribution()
+        else:
+            r = self.adversary_strategy.distrib_memory[-1]
+        return self._generate(self.from_distribution(r))
 
 
 class EpsilonImitatorStrategy(Strategy):
@@ -727,7 +730,7 @@ class BetterAnswerLastAdversaryStrategy(Strategy):
         best = better_answer(r, self.nb_team_players)
         if best is None:
             best = []
-        return self.from_distribution(best)    
+        return self._generate(self.from_distribution(best))    
 
 
 class BestAnswerLastAdversaryStrategy(Strategy):
@@ -760,7 +763,7 @@ class BestAnswerLastAdversaryStrategy(Strategy):
         best = best_answer(r, self.nb_team_players)
         if best is None:
             best = []
-        return self.from_distribution(best)    
+        return self._generate(self.from_distribution(best))    
 
 
 class BestAnswerAdversaryStrategy(Strategy):
@@ -789,7 +792,7 @@ class BestAnswerAdversaryStrategy(Strategy):
         best = best_answer(self.current_best, self.nb_team_players)
         if best is None:
             best = self.current_best
-        return self.from_distribution(best)    
+        return self._generate(self.from_distribution(best))   
 
     def save_day_results(self, votes):
         super().save_day_results(votes)
@@ -826,7 +829,7 @@ class FicticiousPlayStrategy(Strategy):
                 dist_min=math.inf,
                 ):
         Strategy.__init__(self,
-                        'best_answer_adversary', 
+                        'ficticious_play', 
                         team_id, 
                         players_ids, 
                         nb_goals, 
@@ -839,7 +842,7 @@ class FicticiousPlayStrategy(Strategy):
     def generate(self):
         if len(self.adversary_strategy_counts) == 0:
             r = self._generate_random_distribution()
-            return self.from_distribution(r)
+            return self._generate(self.from_distribution(r))
         best = []
         score_max = 0
         for r in self.strategy_set:
@@ -851,7 +854,7 @@ class FicticiousPlayStrategy(Strategy):
             if score > score_max:
                 score_max = score
                 best = r
-        return self.from_distribution(best)
+        return self._generate(self.from_distribution(best))
 
     def save_day_results(self, votes):
         super().save_day_results(votes)
@@ -863,5 +866,5 @@ class FicticiousPlayStrategy(Strategy):
             self.adversary_strategy_counts[r] += 1
 
         n = len(self.distrib_memory)
-        for r in self.adversary_strategy:
+        for r in self.adversary_strategy_counts:
             self.adversary_strategy_probas[r] = self.adversary_strategy_counts[r] / n

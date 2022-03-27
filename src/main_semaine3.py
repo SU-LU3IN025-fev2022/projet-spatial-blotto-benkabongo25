@@ -48,7 +48,8 @@ def init(_boardname=None):
     player = game.player
     
 
-def play(nb_iter, 
+def play(
+        nb_iter=100, 
         nb_days=10, 
         dist_min=12,
         strat1=strategies.RandomStrategy,
@@ -247,12 +248,32 @@ def play(nb_iter,
 
 
 if __name__ == '__main__':
-    play(
-        int(sys.argv[1]) if len(sys.argv) == 2 else 100,
-        12, 
-        np.inf, 
-        strategies.EpsilonStrategy, 
-        strategies.EpsilonImitatorMixStrategy,
-        {'eps': 0.6},
-        {'eps': 0.4}
-    )
+    strats = {
+        strategies.RandomStrategy: {},
+        strategies.StubbornStrategy1: {},
+        strategies.StubbornStrategy2: {},
+        strategies.NearStrategy: {},
+        strategies.FarStrategy: {},
+        strategies.EpsilonStrategy: {'eps':0.3},
+        strategies.EpsilonStrategy: {'eps':0.7},
+        strategies.AdversaryImitatorStrategy: {},
+        strategies.EpsilonImitatorStrategy: {'eps':0.3},
+        strategies.EpsilonImitatorMixStrategy: {'eps':0.4},
+        strategies.BetterAnswerLastAdversaryStrategy: {},
+        strategies.BestAnswerLastAdversaryStrategy: {},
+        strategies.BestAnswerAdversaryStrategy: {},
+        strategies.FicticiousPlayStrategy: {}
+    }
+
+    for strat1, args1 in strats.items():
+        for strat2, args2 in strats.items():
+
+            play(
+                100,
+                100, 
+                np.inf, 
+                strat1,
+                strat2,
+                args1,
+                args2
+            )
