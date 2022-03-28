@@ -252,12 +252,12 @@ if __name__ == '__main__':
     }
 
     for strat1, args1 in strats.items():
-        #for strat2, args2 in strats.items():
+        for strat2, args2 in strats.items():
             play(
                 100, 
                 np.inf, 
                 strat1,
-                strategies.FicticiousPlayStrategy,
+                strat2,
                 args1,
-                #args2
+                args2
             )
