@@ -137,8 +137,6 @@ Nous nous sommes intéressés à deux critères pour nos comparaisons : **le sco
 Nous avons ainsi représenté pour chaque affrontement les deux courbes associées.
 Nous avons également représenté les courbes des **scores/coûts**. Plus les valeurs de la courbe est haute, plus la stratégie rapporte des bons scores avec un coût raisonnable.
 
-### Ficticious play
-
 #### Ficticious play - Aléatoire
 <div>
   <img style='display:inline;' src='/out/scores/ficticious_play_random_days_100_dist_inf.png' width='33%'>
@@ -180,9 +178,9 @@ EN effet, elle parcourt des distances inférieures à **Far**.
 
 #### Ficticous play - Imitateur
 <div>
-  <img style='display:inline;' src='/out/scores/imitator_ficticious_play_days_100_dist_inf.png' width='33%'>
-  <img style='display:inline;' src='/out/coasts/imitator_ficticious_play_days_100_dist_inf.png' width='33%'>
-  <img style='display:inline;' src='/out/scores_coasts/imitator_ficticious_play_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/scores/ficticious_play_imitator_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/coasts/ficticious_play_imitator_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/scores_coasts/ficticious_play_imitator_days_100_dist_inf.png' width='33%'>
 </div>
 
 **Ficticious play** bat la stratégie **Imitator**. Les coûts de leurs trajets parcourus sont quasi équivalents.
@@ -219,19 +217,93 @@ On retrouve cet aspect dans des duels avec les stratégies *epsilon* et *imitatr
   <img style='display:inline;' src='/out/scores_coasts/ficticious_play_best_answer_last_adversary_days_100_dist_inf.png' width='33%'>
 </div>
 
+#### Ficticous play - Meilleure réponse à tous les coups précédents
+<div>
+  <img style='display:inline;' src='/out/scores/ficticious_play_best_answer_adversary_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/coasts/ficticious_play_best_answer_adversary_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/scores_coasts/ficticious_play_best_answer_adversary_days_100_dist_inf.png' width='33%'>
+</div>
 
-### Stratégies de meilleure réponse
+#### Ficticious play - Ficticious play
+<div>
+  <img style='display:inline;' src='/out/scores/ficticious_play_ficticious_play_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/coasts/ficticious_play_ficticious_play_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/scores_coasts/ficticious_play_ficticious_play_days_100_dist_inf.png' width='33%'>
+</div>
 
 
-### Stratégies imitatrices
+#### Imitateur - Aléatoire
+<div>
+  <img style='display:inline;' src='/out/scores/imitator_random_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/coasts/imitator_random_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/scores_coasts/imitator_random_days_100_dist_inf.png' width='33%'>
+</div>
+
+#### Imitateur - Espilon
+<div>
+  <img style='display:inline;' src='/out/scores/imitator_epsilon_0.4_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/coasts/imitator_epsilon_0.4_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/scores_coasts/imitator_epsilon_0.4_days_100_dist_inf.png' width='33%'>
+</div>
+
+#### Imitateur - Meilleure réponse
+<div>
+  <img style='display:inline;' src='/out/scores/imitator_best_answer_adversary_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/coasts/imitator_best_answer_adversary_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/scores_coasts/imitator_best_answer_adversary_days_100_dist_inf.png' width='33%'>
+</div>
 
 
-### Stratégies epsilon-greedy
+#### Epsilon - Epsilon imitateur
+<div>
+  <img style='display:inline;' src='/out/scores/epsilon_0.4_epsilon_imitator_0.4_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/coasts/epsilon_0.4_epsilon_imitator_0.4_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/scores_coasts/epsilon_0.4_epsilon_imitator_0.4_days_100_dist_inf.png' width='33%'>
+</div>
+
+#### Epsilon - Epsilon imiateur mix
+<div>
+  <img style='display:inline;' src='/out/scores/epsilon_0.4_epsilon_imitator_mix_0.4_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/coasts/epsilon_0.4_epsilon_imitator_mix_0.4_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/scores_coasts/epsilon_0.4_epsilon_imitator_mix_0.4_days_100_dist_inf.png' width='33%'>
+</div>
+
+#### Epsilon imitateur - Epsilon imiateur mix
+<div>
+  <img style='display:inline;' src='/out/scores/epsilon_imitator_0.4_epsilon_imitator_mix_0.4_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/coasts/epsilon_imitator_0.4_epsilon_imitator_mix_0.4_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/scores_coasts/epsilon_imitator_0.4_epsilon_imitator_mix_0.4_days_100_dist_inf.png' width='33%'>
+</div>
+
+#### Epsilon imitateur mix - Epsilon imiateur mix
+<div>
+  <img style='display:inline;' src='/out/scores/epsilon_imitator_mix_0.4_epsilon_imitator_mix_0.4_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/coasts/epsilon_imitator_mix_0.4_epsilon_imitator_mix_0.4_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/scores_coasts/epsilon_imitator_mix_0.4_epsilon_imitator_mix_0.4_days_100_dist_inf.png' width='33%'>
+</div>
+
+#### Epsilon - Aléatoire
+<div>
+  <img style='display:inline;' src='/out/scores/epsilon_0.4_random_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/coasts/epsilon_0.4_random_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/scores_coasts/epsilon_0.4_random_days_100_dist_inf.png' width='33%'>
+</div>
 
 
-### Aléatoire
+#### Meilleure réponse à tous les coups - Meilleure réponse au dernier coup
+<div>
+  <img style='display:inline;' src='/out/scores/best_answer_adversary_best_answer_last_adversary_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/coasts/best_answer_adversary_best_answer_last_adversary_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/scores_coasts/best_answer_adversary_best_answer_last_adversary_days_100_dist_inf.png' width='33%'>
+</div>
 
-Nous allons lister les stratégies dominées par la stratégie aléatoire, en terme de scores cumulés.
+#### Meilleure réponse au dernier coup - Aléatoire
+<div>
+  <img style='display:inline;' src='/out/scores/best_answer_last_adversary_random_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/coasts/best_answer_last_adversary_random_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/scores_coasts/best_answer_last_adversary_random_days_100_dist_inf.png' width='33%'>
+</div>
+
 
 #### Aléatoire - Plus proche
 <div>
@@ -255,4 +327,16 @@ Nous allons lister les stratégies dominées par la stratégie aléatoire, en te
 </div>
 
 
-### Stochastique expert
+#### Stochastique expert - Aléatoire
+<div>
+  <img style='display:inline;' src='/out/scores/stochastic_expert_random_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/coasts/stochastic_expert_random_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/scores_coasts/stochastic_expert_random_days_100_dist_inf.png' width='33%'>
+</div>
+
+#### Stochastique expert - Ficticious play
+<div>
+  <img style='display:inline;' src='/out/scores/stochastic_expert_ficticious_play_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/coasts/stochastic_expert_ficticious_play_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/scores_coasts/stochastic_expert_ficticious_play_days_100_dist_inf.png' width='33%'>
+</div>
