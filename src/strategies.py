@@ -493,6 +493,8 @@ class EpsilonStrategy(Strategy):
                 if len(self.accessibles[j]) > 0:
                     v[j] = random.choice(self.accessibles[j])
         else: # best 
+            if self.current_best == []:
+                self.current_best = self._generate_random_distribution()
             v = self.from_distribution(self.current_best)
         return self._generate(v)             
 
@@ -595,6 +597,8 @@ class EpsilonImitatorStrategy(Strategy):
 
     def generate(self):
         if len(self.strat_counts) > 0 and random.random() > self.eps: # best
+            if self.current_best == []:
+                self.current_best = self._generate_random_distribution()
             v = self.from_distribution(self.current_best)
         else: # random
             v = {}
@@ -662,6 +666,8 @@ class EpsilonImitatorMixStrategy(Strategy):
                 if len(self.accessibles[j]) > 0:
                     v[j] = random.choice(self.accessibles[j])
         else: # best 
+            if self.current_best == []:
+                self.current_best = self._generate_random_distribution()
             v = self.from_distribution(self.current_best)
         return self._generate(v)             
 
