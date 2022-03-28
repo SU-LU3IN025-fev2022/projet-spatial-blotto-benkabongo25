@@ -132,22 +132,127 @@ Aggrégat de plusieurs stratégies de jeu. A chaque coup, avec une probabilité 
 Nous avons lancé des tournois et comparé toutes les stratégies que nous avons implémentées entre elles.
 Nous allons ici présenter les résultats que nous avons obtenus.
 
-Nous nous sommes intéressés à deux critères pour nos comparaisons : **le score cumulé** et **le coût de trajet cumulé** au fil des jours de campagne.
+Nous nous sommes intéressés à deux critères pour nos comparaisons : **le score cumulé** et **le coût de trajet cumulé** au fil des jours de campagne. Nous avons fixé le nombre de jours à 100.
 
 Nous avons ainsi représenté pour chaque affrontement les deux courbes associées.
-Nous avons également représenté les courbes des **scores/coûts**. 
+Nous avons également représenté les courbes des **scores/coûts**. Plus les valeurs de la courbe est haute, plus la stratégie rapporte des bons scores avec un coût raisonnable.
+
+### Ficticious play
+
+#### Ficticious play - Aléatoire
+<div>
+  <img style='display:inline;' src='/out/scores/ficticious_play_random_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/coasts/ficticious_play_random_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/scores_coasts/ficticious_play_random_days_100_dist_inf.png' width='33%'>
+</div>
+
+**Ficticious play** est meilleure que **Random**. Leurs distances parcourues sont quasi équivalentes.
+On verra par la suite que, face à **Ficticious play**, **Random** n'est pas la pire.
+
+#### Ficticious play - Tétu
+<div>
+  <img style='display:inline;' src='/out/scores/ficticious_play_stubborn_2_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/coasts/ficticious_play_stubborn_2_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/scores_coasts/ficticious_play_stubborn_2_days_100_dist_inf.png' width='33%'>
+</div>
+
+**Ficticious play** apprend la stratégie du **Stubborn** ; et avec des trajets plus longs en comparaison, elle la bat à tous les coups.
+
+#### Ficticous play - Plus proche
+<div>
+  <img style='display:inline;' src='/out/scores/ficticious_play_near_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/coasts/ficticious_play_near_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/scores_coasts/ficticious_play_near_days_100_dist_inf.png' width='33%'>
+</div>
+
+**Ficticious play** cumule un score bien meilleur que **Near**.
+Cependant, le coût cumulé de ses différents trajets est supérieur à ce dernier.
+
+#### Ficticous play - Plus loin
+<div>
+  <img style='display:inline;' src='/out/scores/ficticious_play_far_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/coasts/ficticious_play_far_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/scores_coasts/ficticious_play_far_days_100_dist_inf.png' width='33%'>
+</div>
+
+**Ficticious play** bat **Far**, et en terme du score et de coût de trajet.
+EN effet, elle parcourt des distances inférieures à **Far**.
+
+#### Ficticous play - Imitateur
+<div>
+  <img style='display:inline;' src='/out/scores/imitator_ficticious_play_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/coasts/imitator_ficticious_play_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/scores_coasts/imitator_ficticious_play_days_100_dist_inf.png' width='33%'>
+</div>
+
+**Ficticious play** bat la stratégie **Imitator**. Les coûts de leurs trajets parcourus sont quasi équivalents.
+Nous constatons cependant que la stratégie **Imitator** est intéressante quand on la mesure à **Ficticious play**. En effet, elle imite la meilleure réponse que **Ficticious play** donne sur l'ensemble des coups précédents.
+
+Ce duel rappelle un peu l'apprentissage par renforcement. En permanence, **Ficticious play** cherchera à jouer des stratégies bien meilleures comparées à celles qu'elle avait déjà jouées.
+On retrouve cet aspect dans des duels avec les stratégies *epsilon* et *imitatrices*.
+
+#### Ficticous play - Epsilon
+<div>
+  <img style='display:inline;' src='/out/scores/ficticious_play_epsilon_0.4_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/coasts/ficticious_play_epsilon_0.4_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/scores_coasts/ficticious_play_epsilon_0.4_days_100_dist_inf.png' width='33%'>
+</div>
+
+#### Ficticous play - Epsilon imitateur
+<div>
+  <img style='display:inline;' src='/out/scores/ficticious_play_epsilon_imitator_0.4_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/coasts/ficticious_play_epsilon_imitator_0.4_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/scores_coasts/ficticious_play_epsilon_0.4_days_100_dist_inf.png' width='33%'>
+</div>
+
+#### Ficticous play - Epsilon imitateur mix
+<div>
+  <img style='display:inline;' src='/out/scores/ficticious_play_epsilon_imitator_mix_0.4_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/coasts/ficticious_play_epsilon_imitator_mix_0.4_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/scores_coasts/ficticious_play_epsilon_imitator_mix_0.4_days_100_dist_inf.png' width='33%'>
+</div>
+
+#### Ficticous play - Meilleure réponse au dernier coup
+<div>
+  <img style='display:inline;' src='/out/scores/ficticious_play_best_answer_last_adversary_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/coasts/ficticious_play_best_answer_last_adversary_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/scores_coasts/ficticious_play_best_answer_last_adversary_days_100_dist_inf.png' width='33%'>
+</div>
+
+
+### Stratégies de meilleure réponse
+
+
+### Stratégies imitatrices
+
+
+### Stratégies epsilon-greedy
+
 
 ### Aléatoire
 
-#### Aléatoire contre aléatoire
+Nous allons lister les stratégies dominées par la stratégie aléatoire, en terme de scores cumulés.
 
-<img src=''>
-![alt text](/out/scores/random_random_days_100_dist_inf.png)
-![alt text](/out/coasts/random_random_days_100_dist_inf.png)
-![alt text](/out/scores_coasts/random_random_days_100_dist_inf.png)
+#### Aléatoire - Plus proche
+<div>
+  <img style='display:inline;' src='/out/scores/random_near_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/coasts/random_near_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/scores_coasts/random_near_days_100_dist_inf.png' width='33%'>
+</div>
 
-### Aléatoire contre tétu
+#### Aléatoire - Plus loin
+<div>
+  <img style='display:inline;' src='/out/scores/random_far_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/coasts/random_far_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/scores_coasts/random_far_days_100_dist_inf.png' width='33%'>
+</div>
 
-![alt text](/out/scores/random_stubborn_1_days_100_dist_inf.png)
-![alt text](/out/coasts/random_stubborn_1_days_100_dist_inf.png)
-![alt text](/out/scores_coasts/random_stubborn_1_days_100_dist_inf.png)
+#### Alétoire - Tétu
+<div>
+  <img style='display:inline;' src='/out/scores/random_stubborn_2_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/coasts/random_stubborn_2_days_100_dist_inf.png' width='33%'>
+  <img style='display:inline;' src='/out/scores_coasts/random_stubborn_2_days_100_dist_inf.png' width='33%'>
+</div>
+
+
+### Stochastique expert
