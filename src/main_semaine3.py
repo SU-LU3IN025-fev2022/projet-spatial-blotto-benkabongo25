@@ -250,43 +250,11 @@ def play(
 
 
 if __name__ == '__main__':
-    strats1 = {
-        strategies.AdversaryImitatorStrategy: {},
-        strategies.EpsilonImitatorStrategy: {'eps':0.3},
-        strategies.EpsilonImitatorMixStrategy: {'eps':0.4},
-        strategies.BetterAnswerLastAdversaryStrategy: {},
-        strategies.BestAnswerLastAdversaryStrategy: {},
-        strategies.BestAnswerAdversaryStrategy: {},
-        strategies.FicticiousPlayStrategy: {}
-    }
-
-    strats2 = {
-        strategies.RandomStrategy: {},
-        strategies.StubbornStrategy1: {},
-        strategies.StubbornStrategy2: {},
-        strategies.NearStrategy: {},
-        strategies.FarStrategy: {},
-        strategies.EpsilonStrategy: {'eps':0.3},
-        strategies.EpsilonStrategy: {'eps':0.7},
-        strategies.AdversaryImitatorStrategy: {},
-        strategies.EpsilonImitatorStrategy: {'eps':0.3},
-        strategies.EpsilonImitatorMixStrategy: {'eps':0.4},
-        strategies.BetterAnswerLastAdversaryStrategy: {},
-        strategies.BestAnswerLastAdversaryStrategy: {},
-        strategies.BestAnswerAdversaryStrategy: {},
-        strategies.FicticiousPlayStrategy: {}
-    }
-
-    for strat1, args1 in strats1.items():
-        for strat2, args2 in strats2.items():
-
-            play(
-                False,
-                100,
-                100, 
-                np.inf, 
-                strat1,
-                strat2,
-                args1,
-                args2
-            )
+    play(
+        True,
+        100,
+        100, 
+        np.inf,
+        strategies.RandomStrategy,
+        strategies.FicticiousPlayStrategy
+    )

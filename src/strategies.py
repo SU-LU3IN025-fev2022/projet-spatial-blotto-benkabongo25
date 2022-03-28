@@ -27,7 +27,7 @@ def compare(r1, r2):
     if a == .5:
         return 0, 0
     w = 1 if a > .5 else 2
-    return w, s
+    return w, int(s)
     
 
 def generate_distrib(limit, size):
@@ -194,7 +194,6 @@ class Strategy:
         goals = list(v.values())
         r = tuple([goals.count(i) for i in range(self.nb_goals)])
         self.distrib_memory.append(r)
-        print(self.name, r)
         return v, r
 
     def _generate_random_distribution(self):
@@ -391,10 +390,7 @@ class StubbornStrategy2(Strategy):
                         dist_min)
 
         if len(r) == 0:
-            r = [
-                self.nb_team_players // self.nb_goals 
-                for _ in range(self.nb_goals)
-            ]
+            r = self._generate_random_distribution()
         self.r = r
 
     def generate(self):
@@ -598,19 +594,19 @@ class EpsilonImitatorStrategy(Strategy):
         self.eps = eps
 
     def generate(self):
-        if len(self.strat_counts) == 0 or random.random() < self.eps: # random
+        if len(self.strat_counts) > 0 and random.random() > self.eps: # best
+            v = self.from_distribution(self.current_best)
+        else: # random
             v = {}
             for j in self.players_ids:
                 if len(self.accessibles[j]) > 0:
                     v[j] = random.choice(self.accessibles[j])
-        else: # best 
-            v = self.from_distribution(self.current_best)
         return self._generate(v)             
 
     def save_day_results(self, votes):
         super().save_day_results(votes)
         
-        if len(self.adversary_strategy.distrib_memory) == 0:
+        if len(self.adversary_strategy.score_memory) == 0:
             return
         
         r = self.adversary_strategy.distrib_memory[-1]
@@ -680,7 +676,7 @@ class EpsilonImitatorMixStrategy(Strategy):
         self.strat_cum_scores[r] += s
         self.strat_counts[r] += 1
         
-        if len(self.adversary_strategy.distrib_memory) > 0:
+        if len(self.adversary_strategy.score_memory) > 0:
             r = self.adversary_strategy.distrib_memory[-1]
             s = self.adversary_strategy.score_memory[-1]
             if r not in self.strat_counts:
@@ -797,9 +793,13 @@ class BestAnswerAdversaryStrategy(Strategy):
     def save_day_results(self, votes):
         super().save_day_results(votes)
 
-        if len(self.adversary_strategy.distrib_memory) > 0:
+        if len(self.adversary_strategy.score_memory) > 0:
             r = self.adversary_strategy.distrib_memory[-1]
-            s = self.adversary_strategy.score_memory[-1]
+            try:
+                s = self.adversary_strategy.score_memory[-1]
+            except:
+                print(self.adversary_strategy.score_memory)
+                raise Exception
             if r not in self.strat_counts:
                 self.strat_cum_scores[r] = 0
                 self.strat_counts[r] = 0
@@ -844,12 +844,11 @@ class FicticiousPlayStrategy(Strategy):
             r = self._generate_random_distribution()
             return self._generate(self.from_distribution(r))
         best = []
-        score_max = 0
+        score_max = -1
         for r in self.strategy_set:
             score = 0
             for ra, p in self.adversary_strategy_probas.items():
-                w, s = compare(r, ra)
-                if w == 2: s = self.nb_goals - s
+                s = np.sum(np.array(r) > np.array(ra))
                 score += s * p
             if score > score_max:
                 score_max = score

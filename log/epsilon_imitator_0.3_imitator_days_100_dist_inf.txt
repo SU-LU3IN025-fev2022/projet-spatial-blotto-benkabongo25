@@ -1,0 +1,5 @@
+epsilon_imitator_0.3 - imitator
+epsilon_imitator_0.3 : (1, 0, 1, 2, 3)
+imitator : (1, 0, 1, 2, 3)
+epsilon_imitator_0.3 : (3, 1, 0, 2, 1)
+imitator : (3, 1, 0, 2, 1)
