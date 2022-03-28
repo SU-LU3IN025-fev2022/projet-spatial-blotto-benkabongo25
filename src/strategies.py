@@ -520,26 +520,6 @@ class EpsilonStrategy(Strategy):
         self.current_best = list(r_max)
 
 
-class ExpertStochasticStrategy(Strategy):
-    '''
-    Stratégie du stochastique expert
-
-    Le 
-    '''
-    
-    def __init__(self, 
-                team_id, 
-                players_ids, 
-                nb_goals, 
-                dist_min=math.inf):
-        Strategy.__init__(self,
-                        'stochastic_expert', 
-                        team_id, 
-                        players_ids, 
-                        nb_goals, 
-                        dist_min)
-
-
 class AdversaryImitatorStrategy(Strategy):
     '''
     Stratégie de l'imitateur
@@ -562,10 +542,11 @@ class AdversaryImitatorStrategy(Strategy):
         )
 
     def generate(self):
-        if len(self.adversary_strategy.distrib_memory) == 0:
+        i = self.team_id
+        if len(self.adversary_strategy.distrib_memory) < i:
             r = self._generate_random_distribution()
         else:
-            r = self.adversary_strategy.distrib_memory[-1]
+            r = self.adversary_strategy.distrib_memory[-i]
         return self._generate(self.from_distribution(r))
 
 
@@ -610,11 +591,12 @@ class EpsilonImitatorStrategy(Strategy):
     def save_day_results(self, votes):
         super().save_day_results(votes)
         
-        if len(self.adversary_strategy.score_memory) == 0:
+        i = self.team_id
+        if len(self.adversary_strategy.score_memory) < i:
             return
         
-        r = self.adversary_strategy.distrib_memory[-1]
-        s = self.adversary_strategy.score_memory[-1]
+        r = self.adversary_strategy.distrib_memory[-i]
+        s = self.adversary_strategy.score_memory[-i]
         if r not in self.strat_counts:
             self.strat_cum_scores[r] = 0
             self.strat_counts[r] = 0
@@ -682,9 +664,10 @@ class EpsilonImitatorMixStrategy(Strategy):
         self.strat_cum_scores[r] += s
         self.strat_counts[r] += 1
         
-        if len(self.adversary_strategy.score_memory) > 0:
-            r = self.adversary_strategy.distrib_memory[-1]
-            s = self.adversary_strategy.score_memory[-1]
+        i = self.team_id
+        if len(self.adversary_strategy.score_memory) >= i:
+            r = self.adversary_strategy.distrib_memory[-i]
+            s = self.adversary_strategy.score_memory[-i]
             if r not in self.strat_counts:
                 self.strat_cum_scores[r] = 0
                 self.strat_counts[r] = 0
@@ -714,7 +697,6 @@ class BetterAnswerLastAdversaryStrategy(Strategy):
                 players_ids, 
                 nb_goals, 
                 dist_min=math.inf,
-                adversary_strategy=None
                 ):
         Strategy.__init__(self,
                         'better_answer_last_adversary', 
@@ -722,13 +704,13 @@ class BetterAnswerLastAdversaryStrategy(Strategy):
                         players_ids, 
                         nb_goals, 
                         dist_min)
-        self.adversary_strategy = adversary_strategy
 
     def generate(self):
-        if len(self.adversary_strategy.distrib_memory) == 0:
+        i = self.team_id
+        if len(self.adversary_strategy.distrib_memory) < i:
             r = self._generate_random_distribution()
         else:
-            r = self.adversary_strategy.distrib_memory[-1]
+            r = self.adversary_strategy.distrib_memory[-i]
         best = better_answer(r, self.nb_team_players)
         if best is None:
             best = []
@@ -746,8 +728,7 @@ class BestAnswerLastAdversaryStrategy(Strategy):
                 team_id, 
                 players_ids, 
                 nb_goals, 
-                dist_min=math.inf,
-                adversary_strategy=None
+                dist_min=math.inf
                 ):
         Strategy.__init__(self,
                         'best_answer_last_adversary', 
@@ -755,13 +736,13 @@ class BestAnswerLastAdversaryStrategy(Strategy):
                         players_ids, 
                         nb_goals, 
                         dist_min)
-        self.adversary_strategy = adversary_strategy
 
     def generate(self):
-        if len(self.adversary_strategy.distrib_memory) == 0:
+        i = self.team_id
+        if len(self.adversary_strategy.distrib_memory) < i:
             r = self._generate_random_distribution()
         else:
-            r = self.adversary_strategy.distrib_memory[-1]
+            r = self.adversary_strategy.distrib_memory[-i]
         best = best_answer(r, self.nb_team_players)
         if best is None:
             best = []
@@ -799,13 +780,10 @@ class BestAnswerAdversaryStrategy(Strategy):
     def save_day_results(self, votes):
         super().save_day_results(votes)
 
-        if len(self.adversary_strategy.score_memory) > 0:
-            r = self.adversary_strategy.distrib_memory[-1]
-            try:
-                s = self.adversary_strategy.score_memory[-1]
-            except:
-                print(self.adversary_strategy.score_memory)
-                raise Exception
+        i = self.team_id
+        if len(self.adversary_strategy.score_memory) >= i:
+            r = self.adversary_strategy.distrib_memory[-i]
+            s = self.adversary_strategy.score_memory[-i]
             if r not in self.strat_counts:
                 self.strat_cum_scores[r] = 0
                 self.strat_counts[r] = 0
@@ -864,8 +842,9 @@ class FicticiousPlayStrategy(Strategy):
     def save_day_results(self, votes):
         super().save_day_results(votes)
 
-        if len(self.adversary_strategy.distrib_memory) > 0:
-            r = self.adversary_strategy.distrib_memory[-1]
+        i = self.team_id
+        if len(self.adversary_strategy.distrib_memory) >= i:
+            r = self.adversary_strategy.distrib_memory[-i]
             if r not in self.adversary_strategy_counts:
                 self.adversary_strategy_counts[r] = 0
             self.adversary_strategy_counts[r] += 1
@@ -873,3 +852,53 @@ class FicticiousPlayStrategy(Strategy):
         n = len(self.distrib_memory)
         for r in self.adversary_strategy_counts:
             self.adversary_strategy_probas[r] = self.adversary_strategy_counts[r] / n
+
+
+class ExpertStochasticStrategy(Strategy):
+    '''
+    Stratégie du stochastique expert
+    '''
+    
+    def __init__(self, 
+                team_id, 
+                players_ids, 
+                nb_goals, 
+                dist_min=math.inf):
+        Strategy.__init__(self,
+                        'stochastic_expert', 
+                        team_id, 
+                        players_ids, 
+                        nb_goals, 
+                        dist_min)
+        self.strategies = [
+            FicticiousPlayStrategy(team_id,players_ids, nb_goals, dist_min),
+            BestAnswerAdversaryStrategy(team_id,players_ids, nb_goals, dist_min),
+            EpsilonStrategy(team_id,players_ids, nb_goals, dist_min),
+            RandomStrategy(team_id, players_ids, nb_goals, dist_min),
+            NearStrategy(team_id,players_ids, nb_goals, dist_min),  
+        ]
+        self.p = [.3, .2, .2, .2, .1]
+
+    def generate(self):
+        strats_ids = list(range(len(self.strategies)))
+        i = np.random.choice(strats_ids, p=self.p)
+        v, r = self.strategies[i].generate()
+        for j in strats_ids:
+            if j != i:
+                self.strategies[j]._generate(v)
+        return self._generate(v)
+
+    def save_day_results(self, votes):
+        super().save_day_results(votes)
+        for strat in self.strategies:
+            strat.save_day_results(votes)    
+
+    def set_adversary(self, adversary_strategy):
+        super().set_adversary(adversary_strategy)
+        for strat in self.strategies:
+            strat.set_adversary(adversary_strategy)
+
+    def update_distances(self, team_positions_dict, goals_positions_list):
+        super().update_distances(team_positions_dict, goals_positions_list)
+        for strat in self.strategies:
+            strat.update_distances(team_positions_dict, goals_positions_list)

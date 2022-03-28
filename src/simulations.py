@@ -247,7 +247,8 @@ if __name__ == '__main__':
         strategies.BetterAnswerLastAdversaryStrategy: {},
         strategies.BestAnswerLastAdversaryStrategy: {},
         strategies.BestAnswerAdversaryStrategy: {},
-        strategies.FicticiousPlayStrategy: {}
+        strategies.FicticiousPlayStrategy: {},
+        strategies.ExpertStochasticStrategy: {}
     }
 
     for strat1, args1 in strats.items():
