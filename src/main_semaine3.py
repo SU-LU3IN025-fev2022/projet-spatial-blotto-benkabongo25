@@ -49,6 +49,7 @@ def init(_boardname=None):
     
 
 def play(
+        gui=True,
         nb_iter=100, 
         nb_days=10, 
         dist_min=12,
@@ -168,29 +169,30 @@ def play(
         goals_current_positions = random.sample(legals_positions, nb_goals)
 
         # mise en scène graphique
-        goal_flag_by_player = {i:False for i in goals.keys()}
+        if gui:
+            goal_flag_by_player = {i:False for i in goals.keys()}
 
-        for it in range(nb_iter):
-            for i in goals.keys():
-                if not goal_flag_by_player[i]:
-                    path = paths[i]
-                    row, col = path[it]
-                    players_current_positions[i] = (row, col)
-                    players[i].set_rowcol(row, col)
-                    verbose(f"Pos {i} :({row}, {col})")
-                    if (row, col) == goals[i]:
-                        verbose(f"Le joueur {i} a atteint son but !")
-                        goal_flag_by_player[i] = True
-            
-            if np.all(list(goal_flag_by_player.values())):
-                break
+            for it in range(nb_iter):
+                for i in goals.keys():
+                    if not goal_flag_by_player[i]:
+                        path = paths[i]
+                        row, col = path[it]
+                        players_current_positions[i] = (row, col)
+                        players[i].set_rowcol(row, col)
+                        verbose(f"Pos {i} :({row}, {col})")
+                        if (row, col) == goals[i]:
+                            verbose(f"Le joueur {i} a atteint son but !")
+                            goal_flag_by_player[i] = True
+                
+                if np.all(list(goal_flag_by_player.values())):
+                    break
 
-            game.mainiteration()
+                game.mainiteration()
 
-        # déplacement des cibles
-        for i in range(nb_goals):
-            cibles[i].set_rowcol(*goals_current_positions[i])
-            game.mainiteration()    
+            # déplacement des cibles
+            for i in range(nb_goals):
+                cibles[i].set_rowcol(*goals_current_positions[i])
+                game.mainiteration()    
 
     pygame.quit()
     
@@ -248,7 +250,17 @@ def play(
 
 
 if __name__ == '__main__':
-    strats = {
+    strats1 = {
+        strategies.AdversaryImitatorStrategy: {},
+        strategies.EpsilonImitatorStrategy: {'eps':0.3},
+        strategies.EpsilonImitatorMixStrategy: {'eps':0.4},
+        strategies.BetterAnswerLastAdversaryStrategy: {},
+        strategies.BestAnswerLastAdversaryStrategy: {},
+        strategies.BestAnswerAdversaryStrategy: {},
+        strategies.FicticiousPlayStrategy: {}
+    }
+
+    strats2 = {
         strategies.RandomStrategy: {},
         strategies.StubbornStrategy1: {},
         strategies.StubbornStrategy2: {},
@@ -265,10 +277,11 @@ if __name__ == '__main__':
         strategies.FicticiousPlayStrategy: {}
     }
 
-    for strat1, args1 in strats.items():
-        for strat2, args2 in strats.items():
+    for strat1, args1 in strats1.items():
+        for strat2, args2 in strats2.items():
 
             play(
+                False,
                 100,
                 100, 
                 np.inf, 
