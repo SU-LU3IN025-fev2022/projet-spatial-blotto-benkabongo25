@@ -256,5 +256,5 @@ if __name__ == '__main__':
         100, 
         np.inf,
         strategies.RandomStrategy,
-        strategies.FicticiousPlayStrategy
+        strategies.RandomStrategy
     )
